@@ -2,10 +2,10 @@
 //#include "stm32f1xx_hal_dma.h"
 #include "tim.h"
 #include "Functions.h"
-//1码定时器计数次数0.4*(1000k us/800k Hz)*40=0.32 *40=12.8
-#define CODE_1       (12)
-//0码定时器计数次数0.8*(1000k us/800k Hz)*40=0.64 *40=25.6
-#define CODE_0       (26)
+//0码定时器计数次数1/3us/1.25us*40=0.32 *40=12.8
+#define CODE_0       (13)
+//1码定时器计数次数2/3us/(1000k us/800k Hz)*40=0.9 *50=25.6
+#define CODE_1       (27)
 
 static uint32_t ws2812_buffer[WS2812_COUNT+1][24];
  uint32_t isDAMReady;
@@ -14,7 +14,6 @@ static uint32_t ws2812_buffer[WS2812_COUNT+1][24];
  	HAL_TIM_PWM_Stop_DMA(&htim2,TIM_CHANNEL_1);
  	isDAMReady=1;
  }
-
 void ws2812Setup(void) {
 	//最后一行装在24个0
 	uint8_t i;
@@ -37,7 +36,6 @@ void ws2812Send(void){
 void ws2812SetRGB(uint16_t led, uint8_t red, uint8_t green, uint8_t blue) {
 	uint8_t i;
 	if(led > WS2812_COUNT)return; //avoid overflow 防止写入ID大于LED总数
-
 	for(i=0;i<8;i++) ws2812_buffer[led][i]   = ( (green & (1 << (7 -i)))? (CODE_1):CODE_0 );//数组某一行0~7转化存放G
 	for(i=8;i<16;i++) ws2812_buffer[led][i]  = ( (red & (1 << (15-i)))? (CODE_1):CODE_0 );//数组某一行8~15转化存放R
 	for(i=16;i<24;i++) ws2812_buffer[led][i] = ( (blue & (1 << (23-i)))? (CODE_1):CODE_0 );//数组某一行16~23转化存放B
