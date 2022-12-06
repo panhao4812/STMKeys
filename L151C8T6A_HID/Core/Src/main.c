@@ -99,8 +99,11 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  init_Main();
+
     /* USER CODE BEGIN 3 */
+	  init_Main();
+	  //HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	 // HAL_Delay(1500);
   }
   /* USER CODE END 3 */
 }
@@ -125,7 +128,7 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL4;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL12;
   RCC_OscInitStruct.PLL.PLLDIV = RCC_PLL_DIV3;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {

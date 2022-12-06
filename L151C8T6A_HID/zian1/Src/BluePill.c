@@ -182,7 +182,7 @@ void qmkMode() {
 
 int init_Main(void) {
 	init_LED();		//插电亮灯会掉电，导致hub掉电不识别。所以要提前关灯。
-	HAL_Delay(500);
+	HAL_Delay(300);
 	usbInit();
 	HAL_Delay(500);//最低500ms启动
 
