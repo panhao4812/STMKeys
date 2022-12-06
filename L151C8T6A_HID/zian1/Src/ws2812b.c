@@ -2,9 +2,10 @@
 //#include "stm32f1xx_hal_dma.h"
 #include "tim.h"
 #include "Functions.h"
-
-#define CODE_1       (58)       //1码定时器计数次数
-#define CODE_0       (25)       //0码定时器计数次数
+//1码定时器计数次数0.4*(1000k us/800k Hz)*40=0.32 *40=12.8
+#define CODE_1       (12)
+//0码定时器计数次数0.8*(1000k us/800k Hz)*40=0.64 *40=25.6
+#define CODE_0       (26)
 
 static uint32_t ws2812_buffer[WS2812_COUNT+1][24];
  uint32_t isDAMReady;
