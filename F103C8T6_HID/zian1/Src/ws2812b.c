@@ -3,8 +3,8 @@
 #include "tim.h"
 #include "Functions.h"
 
-#define CODE_1       (58)       //1码定时器计数次数
-#define CODE_0       (25)       //0码定时器计数次数
+#define CODE_1       (58)       //1码定时器计数次数 58/72=0.805
+#define CODE_0       (25)       //0码定时器计数次数 25/72=0.347
 
 static uint32_t ws2812_buffer[WS2812_COUNT+1][24];
  uint32_t isDAMReady;
