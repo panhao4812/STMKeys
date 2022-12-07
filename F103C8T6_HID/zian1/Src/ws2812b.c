@@ -1,24 +1,27 @@
-//#include "stm32f1xx_hal_tim.h"
-//#include "stm32f1xx_hal_dma.h"
 #include "tim.h"
 #include "Functions.h"
 
 #define CODE_1       (58)       //1码定时器计数次数 58/72=0.805
 #define CODE_0       (25)       //0码定时器计数次数 25/72=0.347
 
-static uint32_t ws2812_buffer[WS2812_COUNT+1][24];
+////1.25us*24=30us
+#define Treset        1
+/////////////需要抗抖，否则第一个灯绿光闪烁
+static uint32_t ws2812_buffer[Treset+WS2812_COUNT+Treset][24];
  uint32_t isDAMReady;
 
  void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
  	HAL_TIM_PWM_Stop_DMA(&htim2,TIM_CHANNEL_1);
  	isDAMReady=1;
  }
-
 void ws2812Setup(void) {
-	//最后一行装在24个0
-	uint8_t i;
+	//最后2行装在24个0
+	uint8_t i,j;
 	for (i = 0; i < 24; i++) {
-		ws2812_buffer[WS2812_COUNT][i] = 0;
+		for(j = 0; j < Treset; j++) {
+		ws2812_buffer[Treset+WS2812_COUNT+j][i] = 0;
+		ws2812_buffer[j][i] = 0;
+		}
 	}
 	isDAMReady=1;
 }
@@ -26,20 +29,20 @@ void ws2812Clear(void) {
 	for (uint8_t j = 0; j < WS2812_COUNT; j++) {
 		ws2812SetRGB(j,0,0,0);
 	}
+	ws2812Setup();
 }
 void ws2812Send(void){
 	if(isDAMReady==1){
-	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *)ws2812_buffer,(WS2812_COUNT+1)*24);
+	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *)ws2812_buffer,(Treset+WS2812_COUNT+Treset)*24);
 	isDAMReady=0;
 	}
 }
 void ws2812SetRGB(uint16_t led, uint8_t red, uint8_t green, uint8_t blue) {
 	uint8_t i;
 	if(led > WS2812_COUNT)return; //avoid overflow 防止写入ID大于LED总数
-
-	for(i=0;i<8;i++) ws2812_buffer[led][i]   = ( (green & (1 << (7 -i)))? (CODE_1):CODE_0 );//数组某一行0~7转化存放G
-	for(i=8;i<16;i++) ws2812_buffer[led][i]  = ( (red & (1 << (15-i)))? (CODE_1):CODE_0 );//数组某一行8~15转化存放R
-	for(i=16;i<24;i++) ws2812_buffer[led][i] = ( (blue & (1 << (23-i)))? (CODE_1):CODE_0 );//数组某一行16~23转化存放B
+	for(i=0;i<8;i++) ws2812_buffer[Treset+led][i]   = ( (green & (1 << (7 -i)))? (CODE_1):CODE_0 );//数组某一行0~7转化存放G
+	for(i=8;i<16;i++) ws2812_buffer[Treset+led][i]  = ( (red & (1 << (15-i)))? (CODE_1):CODE_0 );//数组某一行8~15转化存放R
+	for(i=16;i<24;i++) ws2812_buffer[Treset+led][i] = ( (blue & (1 << (23-i)))? (CODE_1):CODE_0 );//数组某一行16~23转化存放B
 }
 void ws2812SetR(uint16_t led, uint8_t red) {
 	if (led > WS2812_COUNT) {

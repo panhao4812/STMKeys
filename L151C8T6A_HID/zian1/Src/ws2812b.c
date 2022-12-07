@@ -1,9 +1,7 @@
-//#include "stm32f1xx_hal_tim.h"
-//#include "stm32f1xx_hal_dma.h"
 #include "tim.h"
 #include "Functions.h"
-//0码定时器计数次数 0.3/(1/32) us=9.6
-#define CODE_0       (8)
+//0码定时器计数次数 0.4/(1/32) us=12.8
+#define CODE_0       (12)
 //1码定时器计数次数 0.8/(1/32) us=25.6
 #define CODE_1       (25)
 ////1.25us*24=30us
@@ -31,10 +29,10 @@ void ws2812Clear(void) {
 	for (uint8_t j = 0; j < WS2812_COUNT; j++) {
 		ws2812SetRGB(j,0,0,0);
 	}
-	ws2812Setup();
 }
 void ws2812Send(void){
 	if(isDAMReady==1){
+	ws2812Setup();
 	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *)ws2812_buffer,(Treset+WS2812_COUNT+Treset)*24);
 	isDAMReady=0;
 	}

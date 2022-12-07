@@ -37,23 +37,16 @@ void Fix_LED(uint16_t delay_val_blink) {
 	}
 }
 void Rainbow_LED(uint16_t delay_val_blink) {
-	for (uint8_t i = 0; i < WS2812_COUNT; i++) {
-		if (rgb_rainbow[i] >= WS2812_COLOR_COUNT)
-			rgb_rainbow[i] = 0;
-		if (delay_val_blink == MAX_DELAY_4) {
-			color_r = Rcolors[rgb_rainbow[i]];
-			ws2812SetR(rgb_pos[i], color_r);
-		}
-		if (delay_val_blink == MAX_DELAY_3) {
-			color_g = Gcolors[rgb_rainbow[i]];
-			ws2812SetG(rgb_pos[i], color_g);
-		}
-		if (delay_val_blink == MAX_DELAY_2) {
-			color_b = Bcolors[rgb_rainbow[i]];
-			ws2812SetB(rgb_pos[i], color_b);
-		}
-		if (delay_val_blink == MAX_DELAY_1) {
+	if (delay_val_blink == MAX_DELAY_3) {
+		for (uint8_t i = 0; i < WS2812_COUNT; i++) {
 			rgb_rainbow[i]++;
+			if (rgb_rainbow[i] >= WS2812_COLOR_COUNT) {
+				rgb_rainbow[i] = 0;
+			}
+			color_r = Rcolors[rgb_rainbow[i]];
+			color_g = Gcolors[rgb_rainbow[i]];
+			color_b = Bcolors[rgb_rainbow[i]];
+			ws2812SetRGB(rgb_pos[i], color_r, color_g, color_b);
 		}
 	}
 }

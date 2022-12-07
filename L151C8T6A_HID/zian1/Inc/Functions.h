@@ -57,7 +57,10 @@ extern USBD_HandleTypeDef hUsbDevice;//oop指针必须是static
 #define RGB_EFFECT_COUNT 2
 #define START_FLASH (uint32_t)(Flash_PAGE_62)
 #define ADD_FLASH (uint32_t)(START_FLASH+ADD_EEP)
-#define MAX_FLASH (uint32_t)(START_FLASH+1024)
+#define MAX_FLASH (uint32_t)(START_FLASH+0x03FF)
+
+//#define START_EEP (uint32_t)(Flash_PAGE_62)
+//#define MAX_EEP (uint32_t)(START_EEP+0x03FF)
 #define MAX_DELAY (uint32_t)(0x0010*6)
 #endif
 //////////////switch delay////////////////
