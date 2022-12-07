@@ -87,18 +87,6 @@ void keyPrintChar(uint16_t wrapdata){
 		keyPrintChinese(datachinese);
 	}
 }
-
-#ifdef MAX_EEP
-void keyPrintWord_EEP(uint16_t address_t){
-	uint16_t len=eeprom_read_word((uint16_t *)address_t);
-	for(uint16_t i=0;i<len;i++){
-		uint16_t address=address_t+i*2+2;
-		if(address>MAX_EEP-1)break;
-		uint16_t data = eeprom_read_word((uint16_t *)address);
-		keyPrintChar(data);
-	}
-}
-#endif
 ////////////////usb repport///////////////
 uint8_t macro_report;
 uint8_t macro_buffer;
@@ -246,16 +234,16 @@ uint8_t usbMacroSend() {
 	}
 #ifdef MAX_EEP
 	if(macro_report&MACRO3){
-		keyPrintWordEEP(ADD_EEP);
+		keyPrintWord_EEP(ADD_EEP);
 		return 1;
 	}
 #endif
 #ifdef MAX_FLASH
 	if (macro_report & MACRO4) {
 		//调试用途
-		//keyPrintWord_Flash(ADD_FLASH);
-		keyPrint0x();
-		keyPrintU8(RGB_STATE);
+		keyPrintWord_Flash(ADD_FLASH);
+		//keyPrint0x();
+		//keyPrintU8(RGB_STATE);
 		return 1;
 	}
 #endif
@@ -367,8 +355,7 @@ void releaseAllKeyboardKeys()
 	keyboard_buffer.keyboard_modifier_keys=0;
 }
 ////////////////////flash///////////////////
-#ifdef MAX_FLASH
-uint16_t flashReadHalfWord(uint32_t address)
+uint16_t ReadHalfWord_ROM(uint32_t address)
 {
 return*(uint16_t*)address;
 }
@@ -391,8 +378,7 @@ void resetMatrix(uint8_t mask,uint32_t address){
 		}
 	}
 }
-void resetMatrixFormFlash(){
-	uint32_t page=START_FLASH;
+void resetMatrix_ROM(uint32_t page){
 	uint16_t address_row=*((uint16_t *)(0+page));
 	uint16_t address_col=*((uint16_t *)(2+page));
 	uint16_t address_hexakeys0=*((uint16_t *)(4+page));
@@ -413,31 +399,50 @@ void resetMatrixFormFlash(){
 	RGB_TYPE=*((uint8_t *)((uint32_t)ADD_RGBTYPE+page));
 	//rgb_type&=0x11;
 }
+void keyPrintWord_ROM(uint32_t address_t,uint32_t address_max){
+	uint16_t len=*((uint16_t *)address_t);
+	if(len<1)return;
+	address_t+=2;
+	if(address_t>address_max)return;
+	for(uint16_t i=0;i<len;i++){
+		uint16_t data = *((uint16_t*)address_t);
+		address_t+=2;
+		if(address_t>address_max)return;
+		if(data==0xFFFF)continue;//保护不要读写空白数据
+		keyPrintChar(data);
+	}
+}
+#ifdef MAX_FLASH
+void resetMatrix_Flash(){
+	resetMatrix_ROM(START_FLASH);
+}
 static uint8_t SramTemp[1024]={0};
+////Flash一页是0xFF///////
 void FLASHPageWrite() {
-	/*
 	HAL_StatusTypeDef status = HAL_ERROR;
+	FLASH_EraseInitTypeDef EraseInitStruct;
+	uint32_t PAGEError;
 	HAL_FLASH_Unlock();
-	SET_BIT(FLASH->CR, FLASH_CR_PER);
-	WRITE_REG(FLASH->AR, START_FLASH);
-	SET_BIT(FLASH->CR, FLASH_CR_STRT);
+	__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR);
+    EraseInitStruct.TypeErase   = FLASH_TYPEERASE_PAGES;	// 刷除方式
+	EraseInitStruct.PageAddress = START_FLASH;	// 起始地址
+    EraseInitStruct.NbPages = 4;
+    status =HAL_FLASHEx_Erase(&EraseInitStruct, &PAGEError);
 	while (status != HAL_OK) {
 		status = FLASH_WaitForLastOperation((uint32_t) FLASH_TIMEOUT_VALUE);
-		CLEAR_BIT(FLASH->CR, FLASH_CR_PER);
 	}
-	for (int i = 0; i < 1024; i += 4) {
+	for (uint32_t i = 0; i < 1024; i += 4) {
 		status = HAL_ERROR;
 		while (status != HAL_OK) {
-			status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,
-			START_FLASH + i, *(uint32_t*) (SramTemp + i));
+			status = HAL_FLASH_Program(
+FLASH_TYPEPROGRAM_WORD,START_FLASH + i, *(uint32_t*) (SramTemp + i));
 		}
 	}
 	HAL_FLASH_Lock();
-	*/
 }
 void FLASHPageCopy() {
 	//复制一份page31
-	for (int i = 0; i < 1024; i += 4) {
+	for (uint32_t i = 0; i < 1024; i += 4) {
 		*(uint32_t*) (SramTemp + i) = *(uint32_t*) (START_FLASH + i);
 	}
 }
@@ -476,16 +481,67 @@ void flashWrite() {
 	}
 }
 void keyPrintWord_Flash(uint32_t address_t){
-	uint16_t len=*((uint16_t *)address_t);
-	if(len<1)return;
-	address_t+=2;
-	if(address_t>MAX_FLASH)return;
-	for(uint16_t i=0;i<len;i++){
-		uint16_t data = *((uint16_t*)address_t);
-		address_t+=2;
-		if(address_t>MAX_FLASH)return;
-		if(data==0xFFFF)continue;//保护不要读写空白数据
-		keyPrintChar(data);
+	keyPrintWord_ROM(address_t,MAX_FLASH);
+}
+#endif
+/////////////////////////////////////////////////////
+#ifdef MAX_EEP
+static uint8_t EEPTemp[1024]={0};
+void EEPPageWrite() {
+	HAL_StatusTypeDef status = HAL_ERROR;
+	HAL_FLASH_Unlock();
+	for (uint32_t i = 0; i < 1024; i += 4) {
+			status = HAL_ERROR;
+			while (status != HAL_OK) {
+				status = HAL_FLASHEx_DATAEEPROM_Program(
+FLASH_TYPEPROGRAMDATA_WORD,START_EEP + i, *(uint32_t*) (EEPTemp + i));
+			}
+		}
+	HAL_FLASH_Lock();
+}
+void EEPPageCopy() {
+	//复制一份page31
+	for (uint32_t i = 0; i < 1024; i += 4) {
+		*(uint32_t*) (EEPTemp + i) = *(uint32_t*) (START_EEP + i);
 	}
+}
+void eepWrite() {	//应该是先写入内存再写入flash
+	//	address,word1,word2,word3
+	if (enableReset == 0) {
+		uint16_t address = raw_report_out.word[0];
+		if (address == 0xF1FF && keyboard_buffer.enable_pressing == 1) {
+			open_LED();
+			keyboard_buffer.enable_pressing = 0;
+			EEPPageCopy();
+		} else if (address == 0xF2FF && keyboard_buffer.enable_pressing == 0) {
+			EEPPageWrite();
+			keyboard_buffer.enable_pressing = 2;
+			close_LED();
+		} else {
+			if (keyboard_buffer.enable_pressing == 0) {
+				//openLED();
+				if (address < MAX_EEP) {
+					*(uint16_t*) (EEPTemp + address)=raw_report_out.word[1];
+				}
+				if ((address + 2) < MAX_EEP) {
+					*(uint16_t*) (EEPTemp + address+2)=raw_report_out.word[2];
+				}
+				if ((address + 4) < MAX_EEP) {
+					*(uint16_t*) (EEPTemp + address+4)=raw_report_out.word[3];
+				}
+				//closeLED();
+			}
+		}
+		memset(&raw_report_out, 0, sizeof(raw_report_out));
+		enableReset = 1;
+	}else{
+		//openLED();
+	}
+}
+void resetMatrix_EEP(){
+	resetMatrix_ROM(START_EEP);
+}
+void keyPrintWord_EEP(uint32_t address_t){
+	keyPrintWord_ROM(address_t,MAX_EEP);
 }
 #endif

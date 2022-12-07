@@ -58,10 +58,9 @@ extern USBD_HandleTypeDef hUsbDevice;//oop指针必须是static
 #define START_FLASH (uint32_t)(Flash_PAGE_62)
 #define ADD_FLASH (uint32_t)(START_FLASH+ADD_EEP)
 #define MAX_FLASH (uint32_t)(START_FLASH+0x03FF)
-
-//#define START_EEP (uint32_t)(Flash_PAGE_62)
-//#define MAX_EEP (uint32_t)(START_EEP+0x03FF)
 #define MAX_DELAY (uint32_t)(0x0010*6)
+#define START_EEP (uint32_t)(0x08080000)
+#define MAX_EEP (uint32_t)(START_EEP+0x0FFF)
 #endif
 //////////////switch delay////////////////
 //rgb_state和rgb_type定义相同,一个是实时，一个是默认状态。
@@ -183,10 +182,6 @@ void timer_LED(uint16_t* delay_val_blink);
 void blink_LED(uint16_t delay_val_blink);
 void rainbow_LED(uint16_t delay_val_blink);
 void fix_LED(uint16_t delay_val_blink);
-void keyPrintWord_EEP(uint16_t address);
-void keyPrintWord_Flash(uint32_t address_t);
-void resetMatrix_Flash();
-void resetMatrix_EEP();
 ////////////////////////macro////////////////////////
 void clearMacro();
 void pressMacroKey(uint8_t key);
@@ -219,15 +214,18 @@ uint8_t usbRecv(uint8_t endpoint,uint8_t *buffer, uint8_t buffersize,uint8_t tim
 uint8_t isBufferClear();
 //////////flash_functions///////////
 void flashWrite();
+void keyPrintWord_Flash(uint32_t address_t);
+void resetMatrix_Flash();
+////////////eep/////////////////
 void eepWrite();
-uint16_t flashReadHalfWord(uint32_t address);
+void keyPrintWord_EEP(uint32_t address);
+void resetMatrix_EEP();
 ////////////////Color////////////////////
 #define WS2812_COLOR_COUNT 0x0200
 extern uint8_t Rcolors [WS2812_COLOR_COUNT];
 extern uint8_t Gcolors[WS2812_COLOR_COUNT];
 extern uint8_t Bcolors[WS2812_COLOR_COUNT];
 //////////////////ws2812///////////////////////
-
 /*Power saver, divide light level with this.*/
 void ws2812Setup(void);
 void ws2812Clear(void);
@@ -236,5 +234,5 @@ void ws2812Send(void);
 void ws2812SetR(uint16_t led, uint8_t red);
 void ws2812SetG(uint16_t led, uint8_t green);
 void ws2812SetB(uint16_t led, uint8_t blue);
-
+////////////////////////////////////////////
 #endif /* INC_FUNCTIONS_H_ */
