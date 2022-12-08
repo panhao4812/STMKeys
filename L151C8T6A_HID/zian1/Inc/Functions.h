@@ -71,14 +71,14 @@ extern USBD_HandleTypeDef hUsbDevice;//oop指针必须是static
 //bit0-3->第1组 0 fix rgb_fixcolor[]，1 Rainbow rgb_rainbow[]，print
 #define DELAY_AFTER (uint8_t)(0x08*6)
 #define DELAY_BEFORE (uint8_t)(0x04*6)
-#define MAX_DELAY_1 MAX_DELAY*1
-#define MAX_DELAY_2 MAX_DELAY*2
-#define MAX_DELAY_3 MAX_DELAY*3
-#define MAX_DELAY_4 MAX_DELAY*4
-#define MAX_DELAY_5 MAX_DELAY*5
-#define MAX_DELAY_6 MAX_DELAY*6
-#define MAX_DELAY_7 MAX_DELAY*7
-#define MAX_DELAY_8 MAX_DELAY*8
+#define MAX_DELAY_1 (uint32_t)(MAX_DELAY*1)
+#define MAX_DELAY_2 (uint32_t)(MAX_DELAY*2)
+#define MAX_DELAY_3 (uint32_t)(MAX_DELAY*3)
+#define MAX_DELAY_4 (uint32_t)(MAX_DELAY*4)
+#define MAX_DELAY_5 (uint32_t)(MAX_DELAY*5)
+#define MAX_DELAY_6 (uint32_t)(MAX_DELAY*6)
+#define MAX_DELAY_7 (uint32_t)(MAX_DELAY*7)
+#define MAX_DELAY_8 (uint32_t)(MAX_DELAY*8)
 ////////////////////struct////////////////////////
 typedef struct {
 	uint8_t report_id;

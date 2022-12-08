@@ -1,7 +1,7 @@
 #include "tim.h"
 #include "Functions.h"
 //0码定时器计数次数 0.4/(1/32) us=12.8
-#define CODE_0       (12)
+#define CODE_0       (9)
 //1码定时器计数次数 0.8/(1/32) us=25.6
 #define CODE_1       (25)
 ////1.25us*24=30us
