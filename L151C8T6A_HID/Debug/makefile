@@ -65,8 +65,8 @@ all: main-build
 main-build: L151C8T6A_HID.elf secondary-outputs
 
 # Tool invocations
-L151C8T6A_HID.elf L151C8T6A_HID.map: $(OBJS) $(USER_OBJS) C:\Users\Administrator\Documents\STM32CubeIDE\workspace_1.10.1\STM_Keys\L151C8T6A_HID\STM32L151C8TXA_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "L151C8T6A_HID.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Administrator\Documents\STM32CubeIDE\workspace_1.10.1\STM_Keys\L151C8T6A_HID\STM32L151C8TXA_FLASH.ld" --specs=nosys.specs -Wl,-Map="L151C8T6A_HID.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+L151C8T6A_HID.elf L151C8T6A_HID.map: $(OBJS) $(USER_OBJS) C:\Users\Administrator\Documents\GitHub20211201\STMKeys\L151C8T6A_HID\STM32L151C8TXA_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "L151C8T6A_HID.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Administrator\Documents\GitHub20211201\STMKeys\L151C8T6A_HID\STM32L151C8TXA_FLASH.ld" --specs=nosys.specs -Wl,-Map="L151C8T6A_HID.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
