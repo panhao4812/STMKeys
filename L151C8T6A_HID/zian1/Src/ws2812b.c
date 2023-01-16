@@ -7,7 +7,7 @@
 ////1.25us*24=30us
 #define Treset        1
 /////////////需要抗抖，否则第一个灯绿光闪烁
-static uint8_t ws2812_buffer[Treset+WS2812_COUNT+Treset][24];
+static uint32_t ws2812_buffer[Treset+WS2812_COUNT+Treset][24];
 uint8_t isDAMReady;
 
  void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
@@ -26,22 +26,24 @@ void ws2812Setup(void) {
 	isDAMReady=1;
 }
 void ws2812Clear(void) {
-	uint8_t i,j;
+	uint8_t ;
 	for (j = 0; j < WS2812_COUNT; j++) {
 		ws2812SetRGB(j, 0, 0, 0);
 	}
-	for (i = 0; i < 24; i++) {
-		for (j = 0; j < Treset; j++) {
-			ws2812_buffer[Treset + WS2812_COUNT + j][i] = 0;
-			ws2812_buffer[j][i] = 0;
-		}
-	}
+
 }
-void ws2812Send(void){
-	if(isDAMReady==1){
-	//ws2812Setup();
-	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *)ws2812_buffer,(Treset+WS2812_COUNT+Treset)*24);
-	isDAMReady=0;
+void ws2812Send(void) {
+	if (isDAMReady == 1) {
+		uint8_t i,j;
+		for (i = 0; i < 24; i++) {
+			for (j = 0; j < Treset; j++) {
+				ws2812_buffer[Treset + WS2812_COUNT + j][i] = 0;
+				ws2812_buffer[j][i] = 0;
+			}
+		}
+		HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t*) ws2812_buffer,
+				(Treset + WS2812_COUNT + Treset) * 24);
+		isDAMReady = 0;
 	}
 }
 void ws2812SetRGB(uint16_t led, uint8_t red, uint8_t green, uint8_t blue) {
