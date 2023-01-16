@@ -53,7 +53,7 @@ extern USBD_HandleTypeDef hUsbDevice;//oop指针必须是static
 #if defined(BluePill)
 #define ROWS  5
 #define COLS  14
-#define WS2812_COUNT 8
+#define WS2812_COUNT 64
 #define RGB_EFFECT_COUNT 2
 #define START_FLASH (uint32_t)(Flash_PAGE_62)
 #define ADD_FLASH (uint32_t)(START_FLASH+ADD_EEP)
@@ -156,11 +156,11 @@ extern uint16_t rgb_rainbow[WS2812_COUNT];
 extern uint8_t rgb_pos[WS2812_COUNT];
 extern uint8_t led_mask[ROWS][COLS];
 extern uint8_t rgb_fixcolor[(WS2812_COUNT * 3)];
-extern  uint8_t hexa_keys0[ROWS][COLS] ;
-extern  uint8_t hexa_keys1[ROWS][COLS];
-extern  uint8_t key_mask[ROWS][COLS];
-extern  uint8_t row_pins[ROWS];
-extern  uint8_t col_pins[COLS];
+extern uint8_t hexa_keys0[ROWS][COLS] ;
+extern uint8_t hexa_keys1[ROWS][COLS];
+extern uint8_t key_mask[ROWS][COLS];
+extern uint8_t row_pins[ROWS];
+extern uint8_t col_pins[COLS];
 extern uint8_t RGB_TYPE;
 extern uint8_t RGB_STATE;
 extern uint16_t delay_val;

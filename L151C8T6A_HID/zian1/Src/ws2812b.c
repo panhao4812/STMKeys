@@ -26,47 +26,68 @@ void ws2812Setup(void) {
 	isDAMReady=1;
 }
 void ws2812Clear(void) {
-	for (uint8_t j = 0; j < WS2812_COUNT; j++) {
-		ws2812SetRGB(j,0,0,0);
+	uint8_t i,j;
+	for (j = 0; j < WS2812_COUNT; j++) {
+		ws2812SetRGB(j, 0, 0, 0);
+	}
+	for (i = 0; i < 24; i++) {
+		for (j = 0; j < Treset; j++) {
+			ws2812_buffer[Treset + WS2812_COUNT + j][i] = 0;
+			ws2812_buffer[j][i] = 0;
+		}
 	}
 }
 void ws2812Send(void){
 	if(isDAMReady==1){
-	ws2812Setup();
+	//ws2812Setup();
 	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *)ws2812_buffer,(Treset+WS2812_COUNT+Treset)*24);
 	isDAMReady=0;
 	}
 }
 void ws2812SetRGB(uint16_t led, uint8_t red, uint8_t green, uint8_t blue) {
 	uint8_t i;
-	if(led > WS2812_COUNT)return; //avoid overflow 防止写入ID大于LED总数
-	for(i=0;i<8;i++) ws2812_buffer[Treset+led][i]   = ( (green & (1 << (7 -i)))? (CODE_1):CODE_0 );//数组某一行0~7转化存放G
-	for(i=8;i<16;i++) ws2812_buffer[Treset+led][i]  = ( (red & (1 << (15-i)))? (CODE_1):CODE_0 );//数组某一行8~15转化存放R
-	for(i=16;i<24;i++) ws2812_buffer[Treset+led][i] = ( (blue & (1 << (23-i)))? (CODE_1):CODE_0 );//数组某一行16~23转化存放B
-}
-void ws2812SetR(uint16_t led, uint8_t red) {
 	if (led > WS2812_COUNT) {
 		return;
-	}
-//		for(uint8_t i=0;i<8;i++) ws2812_buffer[led][i]   = ( (Color.G & (1 << (7 -i)))? (CODE_1):CODE_0 );//数组某一行0~7转化存放G
-		for(uint8_t i=8;i<16;i++) ws2812_buffer[led][i]  = ( (red & (1 << (15-i)))? (CODE_1):CODE_0 );//数组某一行8~15转化存放R
-//		for(i=16;i<24;i++) ws2812_buffer[led][i] = ( (Color.B & (1 << (23-i)))? (CODE_1):CODE_0 );//数组某一行16~23转化存放B
+	} //avoid overflow 防止写入ID大于LED总数
+	for (i = 0; i < 8; i++) {
+		ws2812_buffer[Treset + led][i] = (
+				(green & (1 << (7 - i))) ? (CODE_1) : CODE_0);
+	} //数组某一行0~7转化存放G
+	for (i = 8; i < 16; i++) {
+		ws2812_buffer[Treset + led][i] = (
+				(red & (1 << (15 - i))) ? (CODE_1) : CODE_0);
+	} //数组某一行8~15转化存放R
+	for (i = 16; i < 24; i++) {
+		ws2812_buffer[Treset + led][i] = (
+				(blue & (1 << (23 - i))) ? (CODE_1) : CODE_0);
+	} //数组某一行16~23转化存放B
 }
 void ws2812SetG(uint16_t led, uint8_t green) {
 	if (led > WS2812_COUNT) {
 		return;
 	}
-		for(uint8_t i=0;i<8;i++) ws2812_buffer[led][i]   = ( (green & (1 << (7 -i)))? (CODE_1):CODE_0 );//数组某一行0~7转化存放G
-	//	for(uint8_t i=8;i<16;i++) ws2812_buffer[led][i]  = ( (Color.R & (1 << (15-i)))? (CODE_1):CODE_0 );//数组某一行8~15转化存放R
-	//	for(i=16;i<24;i++) ws2812_buffer[led][i] = ( (Color.B & (1 << (23-i)))? (CODE_1):CODE_0 );//数组某一行16~23转化存放B
+	for (uint8_t i = 0; i < 8; i++) {
+		ws2812_buffer[Treset + led][i] = (
+				(green & (1 << (7 - i))) ? (CODE_1) : CODE_0);
+	} //数组某一行0~7转化存放G
+}
+void ws2812SetR(uint16_t led, uint8_t red) {
+	if (led > WS2812_COUNT) {
+		return;
+	}
+	for (uint8_t i = 8; i < 16; i++) {
+		ws2812_buffer[Treset + led][i] = (
+				(red & (1 << (15 - i))) ? (CODE_1) : CODE_0);
+	} //数组某一行8~15转化存放R
 }
 void ws2812SetB(uint16_t led, uint8_t blue) {
 	if (led > WS2812_COUNT) {
 		return;
 	}
-	//	for(i=0;i<8;i++) ws2812_buffer[led][i]   = ( (Color.G & (1 << (7 -i)))? (CODE_1):CODE_0 );//数组某一行0~7转化存放G
-	//	for(i=8;i<16;i++) ws2812_buffer[led][i]  = ( (Color.R & (1 << (15-i)))? (CODE_1):CODE_0 );//数组某一行8~15转化存放R
-		for(uint8_t i=16;i<24;i++) ws2812_buffer[led][i] = ( (blue & (1 << (23-i)))? (CODE_1):CODE_0 );//数组某一行16~23转化存放B
+	for (uint8_t i = 16; i < 24; i++) {
+		ws2812_buffer[Treset + led][i] = (
+				(blue & (1 << (23 - i))) ? (CODE_1) : CODE_0);
+	} //数组某一行16~23转化存放B
 }
 /////////////////////Color//////////////////////
  uint8_t Rcolors [WS2812_COLOR_COUNT]=
