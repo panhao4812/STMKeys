@@ -7,7 +7,7 @@
 ////1.25us*24=30us
 #define Treset        1
 /////////////需要抗抖，否则第一个灯绿光闪烁
-static uint32_t ws2812_buffer[Treset+WS2812_COUNT+Treset][24];
+static uint8_t ws2812_buffer[Treset+WS2812_COUNT+Treset][24];
 uint8_t isDAMReady;
 
  void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
@@ -41,7 +41,7 @@ void ws2812Send(void) {
 				ws2812_buffer[j][i] = 0;
 			}
 		}
-		HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t*) ws2812_buffer,
+		HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint8_t*) ws2812_buffer,
 				(Treset + WS2812_COUNT + Treset) * 24);
 		isDAMReady = 0;
 	}
