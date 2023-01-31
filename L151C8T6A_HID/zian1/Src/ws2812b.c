@@ -26,7 +26,7 @@ void ws2812Setup(void) {
 	isDAMReady=1;
 }
 void ws2812Clear(void) {
-	uint8_t ;
+	uint8_t j;
 	for (j = 0; j < WS2812_COUNT; j++) {
 		ws2812SetRGB(j, 0, 0, 0);
 	}
@@ -41,7 +41,7 @@ void ws2812Send(void) {
 				ws2812_buffer[j][i] = 0;
 			}
 		}
-		HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint8_t*) ws2812_buffer,
+		HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t*) ws2812_buffer,
 				(Treset + WS2812_COUNT + Treset) * 24);
 		isDAMReady = 0;
 	}
